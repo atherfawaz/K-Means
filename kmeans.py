@@ -13,6 +13,8 @@ CLUSTERS = 3
 MEANS = []
 FILE = 'face.bmp'
 IMAGE = mpimg.imread(FILE)
+UPDATED_MEANS = [[0 for x in range(CLUSTERS)] for x in range(0)]
+BOOKKEEPING = [[0 for x in range(CLUSTERS)] for x in range(IMAGE.size)]
 plt.imshow(IMAGE)
 random.seed(time.perf_counter())
 
@@ -37,16 +39,36 @@ class Point:
     def get_point():
         return Point(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
 
-def euclidean_distance(a, b):
-    distance = math.sqrt((a.x - b.x)**2 + (a.y - b.y)**2 + (a.z - b.z)**2)
+def euclidean_distance(pixel, point):
+    distance = math.sqrt((pixel[0] - point.x)**2 + (pixel[1] - point.y)**2 + (pixel[2] - point.z)**2)
     return distance
 
 if __name__ == "__main__":
-    p1 = Point.get_point()
+    '''p1 = Point.get_point()
     p2 = Point.get_point()
-    p3 = Point.get_point()
-    MEANS.append(p1)
-    MEANS.append(p2)
-    MEANS.append(p3)
+    p3 = Point.get_point()'''
+    for i in range(0,CLUSTERS):
+        MEANS.append(Point.get_point())
     print(MEANS)
-    print(euclidean_distance(p1, p2))
+    
+
+    pixelIndex = 0
+    for i in IMAGE:
+        for pixel in i:
+            counter = 0
+            minimum = 1000000
+            for mean in MEANS:
+                distance = euclidean_distance(pixel, mean)
+                if (distance < minimum):
+                    minimum = distance
+                    minIndex = counter
+                counter+=1
+            BOOKKEEPING[pixelIndex][minIndex] = 1
+            pixelIndex+=1
+    dummy =1 
+    #Updating means
+    '''for i in range(0,CLUSTERS)
+        quotient = BOOKKEEPING[x].count(1)
+        MEANS[i] = np.dot(BOOKKEEPING[i],IMAGE)/quotient'''
+   
+    
