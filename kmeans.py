@@ -8,13 +8,14 @@ import cv2
 import random
 from PIL import Image
 
-#GLOBALS    
+#GLOBALS   
+MAX_ITERS = 100 
 CLUSTERS = 3
 MEANS = []
 FILE = 'face.bmp'
-IMAGE = mpimg.imread(FILE)
+IMAGE = mpimg.imread(FILE) #dims = 220x200x3
 UPDATED_MEANS = [[0 for x in range(CLUSTERS)] for x in range(0)]
-BOOKKEEPING = [[0 for x in range(CLUSTERS)] for x in range(IMAGE.size)]
+BOOKKEEPING = [[0 for x in range(CLUSTERS)] for x in range(int(IMAGE.size/3))]
 plt.imshow(IMAGE)
 random.seed(time.perf_counter())
 
@@ -47,11 +48,14 @@ if __name__ == "__main__":
     '''p1 = Point.get_point()
     p2 = Point.get_point()
     p3 = Point.get_point()'''
+    img_flattened = np.reshape(IMAGE, (44000,3))
     for i in range(0,CLUSTERS):
         MEANS.append(Point.get_point())
-    print(MEANS)
     
-
+change = True 
+iters = 0
+while (change is not False and iters!=MAX_ITERS):
+    print(MEANS)
     pixelIndex = 0
     for i in IMAGE:
         for pixel in i:
@@ -65,10 +69,18 @@ if __name__ == "__main__":
                 counter+=1
             BOOKKEEPING[pixelIndex][minIndex] = 1
             pixelIndex+=1
-    dummy =1 
+    
     #Updating means
-    '''for i in range(0,CLUSTERS)
-        quotient = BOOKKEEPING[x].count(1)
-        MEANS[i] = np.dot(BOOKKEEPING[i],IMAGE)/quotient'''
-   
+    bookkeeping_tp = np.transpose(BOOKKEEPING)
+    for i in range(0,CLUSTERS):
+        quotient = np.count_nonzero(bookkeeping_tp[i] == 1)
+        print("This is the ", i+1, " mean count: ", quotient)
+        if (quotient!=0):
+            TEMP = np.dot(bookkeeping_tp[i],img_flattened)/quotient
+            MEANS[i].x = TEMP[0]
+            MEANS[i].y = TEMP[1]
+            MEANS[i].z = TEMP[2]
+    BOOKKEEPING = [[0 for x in range(CLUSTERS)] for x in range(int(IMAGE.size/3))]
+    iters+=1
+
     
