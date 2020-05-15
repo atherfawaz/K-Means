@@ -80,6 +80,8 @@ while (change is not False and iters!=MAX_ITERS):
             MEANS[i].x = TEMP[0]
             MEANS[i].y = TEMP[1]
             MEANS[i].z = TEMP[2]
+        else:
+            MEANS[i] = Point.get_point()
     BOOKKEEPING = [[0 for x in range(CLUSTERS)] for x in range(int(IMAGE.size/3))]
     iters+=1
 
