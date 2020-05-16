@@ -9,11 +9,12 @@ import random
 from PIL import Image
 
 # GLOBALS
-MAX_ITERS = 100
+MAX_ITERS = 5
 CLUSTERS = 3
 MEANS = []
 FILE = 'face.bmp'
 IMAGE = mpimg.imread(FILE)  # dims = 220x200x3
+NEW_IMAGE = IMAGE
 UPDATED_MEANS = [[0 for x in range(CLUSTERS)] for x in range(0)]
 BOOKKEEPING = [[0 for x in range(CLUSTERS)] for x in range(int(IMAGE.size/3))]
 plt.imshow(IMAGE)
@@ -61,6 +62,7 @@ iters = 0
 
 while (change is not False and iters != MAX_ITERS):
     print(MEANS)
+    BOOKKEEPING = [[0 for x in range(CLUSTERS)] for x in range(int(IMAGE.size/3))]
     pixelIndex = 0
     for i in IMAGE:
         for pixel in i:
@@ -78,15 +80,26 @@ while (change is not False and iters != MAX_ITERS):
     # Updating means
     bookkeeping_tp = np.transpose(BOOKKEEPING)
     for i in range(0, CLUSTERS):
-        quotient = np.count_nonzero(bookkeeping_tp[i] == 1)
-        print("This is the ", i+1, " mean count: ", quotient)
-        if (quotient != 0):
-            TEMP = np.dot(bookkeeping_tp[i], img_flattened)/quotient
-            MEANS[i].x = TEMP[0]
-            MEANS[i].y = TEMP[1]
-            MEANS[i].z = TEMP[2]
+        divisor = np.count_nonzero(bookkeeping_tp[i] == 1)
+        print("This is the ", i+1, " mean count: ", divisor)
+        if (divisor != 0):
+            TEMP = np.dot(bookkeeping_tp[i], img_flattened)/divisor
+            MEANS[i].x = int(TEMP[0])
+            MEANS[i].y = int(TEMP[1])
+            MEANS[i].z = int(TEMP[2])
         else:
             MEANS[i] = Point.get_point()
-    BOOKKEEPING = [[0 for x in range(CLUSTERS)]
-                   for x in range(int(IMAGE.size/3))]
     iters += 1
+
+img_flattened = np.array(img_flattened)
+
+for x in range(0, 44000):
+    for y in range(0, CLUSTERS):
+        if (BOOKKEEPING[x][y] is 1):
+            img_flattened[x][0] = MEANS[y].x
+            img_flattened[x][1] = MEANS[y].y
+            img_flattened[x][2] = MEANS[y].z
+print(MEANS)
+img_flattened = np.reshape(img_flattened, (220, 200, 3))
+imgplot = plt.imshow(img_flattened)
+plt.imsave('Reduced.bmp', img_flattened.astype(np.uint8))
