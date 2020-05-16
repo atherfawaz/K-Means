@@ -14,10 +14,9 @@ MAX_CLUSTERS = 10
 MEANS = []
 PREV_MEANS = []
 FILE = 'face.bmp'
-IMAGE = mpimg.imread(FILE)  # dims = 220x200x3
+IMAGE = mpimg.imread(FILE)  # dimension = 220x200x3
 plt.imshow(IMAGE)
 random.seed(time.perf_counter())
-
 
 class Point:
     x = random.randint(0, 255)
@@ -40,13 +39,6 @@ class Point:
     def get_point():
         return Point(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
 
-    def __cmp__(self,other):
-        if self.x < other.x and self.y < other.y and self.z < other.z:
-            return -1
-        elif self.x > other.x and self.y > other.y and self.z > other.z:
-            return 1
-        else:return 0
-
 
 def euclidean_distance(pixel, point):
     distance = math.sqrt((pixel[0] - point.x)**2 +
@@ -55,12 +47,15 @@ def euclidean_distance(pixel, point):
 
 
 if __name__ == "__main__":
-    for CLUSTERS in range(6,MAX_CLUSTERS+1):
+
+    for CLUSTERS in range(2, MAX_CLUSTERS + 1):
+    
         MEANS = []
         PREV_MEANS = []
         UPDATED_MEANS = [[0 for x in range(CLUSTERS)] for x in range(0)]
-        BOOKKEEPING = [[0 for x in range(CLUSTERS)] for x in range(int(IMAGE.size/3))]
-        print ("Number of clusters: ", CLUSTERS)
+        BOOKKEEPING = [[0 for x in range(CLUSTERS)]
+                       for x in range(int(IMAGE.size/3))]
+        print("Number of clusters: ", CLUSTERS)
         img_flattened = np.reshape(IMAGE, (44000, 3))
         for i in range(0, CLUSTERS):
             MEANS.append(Point.get_point())
@@ -70,8 +65,10 @@ if __name__ == "__main__":
         iters = 0
 
         while (change is True and iters != MAX_ITERS):
+            
             print(MEANS)
-            BOOKKEEPING = [[0 for x in range(CLUSTERS)] for x in range(int(IMAGE.size/3))]
+            BOOKKEEPING = [[0 for x in range(CLUSTERS)]
+                           for x in range(int(IMAGE.size/3))]
             pixelIndex = 0
             for i in IMAGE:
                 for pixel in i:
@@ -102,11 +99,9 @@ if __name__ == "__main__":
                     MEANS[i] = Point.get_point()
 
             change = False
-            for i in range(0,len(MEANS)):
+            for i in range(0, len(MEANS)):
                 if MEANS[i].x != PREV_MEANS[i].x or MEANS[i].y != PREV_MEANS[i].y or MEANS[i].z != PREV_MEANS[i].z:
                     change = True
-                else:
-                    dummy = 1
             PREV_MEANS = copy.deepcopy(MEANS)
             iters += 1
 
